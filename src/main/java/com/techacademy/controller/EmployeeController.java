@@ -98,6 +98,39 @@ public class EmployeeController {
         return "redirect:/employees";
     }
 
+    // 従業員更新画面
+    @GetMapping(value = "/{code}/update")
+    public String edit(@PathVariable("code") String code, Employee employee, Model model) {
+        if(code != null) {
+            // Modelに登録
+            model.addAttribute("employee", employeeService.findByCode(code));
+        } else {
+            model.addAttribute("employee", employee);
+        }
+        // 更新画面に遷移
+        return "employees/update";
+    }
+
+    // 従業員更新処理
+    @PostMapping(value = "/{code}/update")
+    public String update(@Validated Employee employee, BindingResult res, Model model) {
+        // 入力チェック
+        if (res.hasErrors()) {
+            return edit(null, employee, model);
+        }
+
+        // 従業員情報を更新する
+        ErrorKinds result = employeeService.update(employee);
+
+        if (ErrorMessage.contains(result)) {
+            model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
+            return edit(null, employee, model);
+        }
+
+        // 一覧画面にリダイレクト
+        return "redirect:/employees";
+    }
+
     // 従業員削除処理
     @PostMapping(value = "/{code}/delete")
     public String delete(@PathVariable String code, @AuthenticationPrincipal UserDetail userDetail, Model model) {
