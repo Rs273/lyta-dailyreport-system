@@ -21,9 +21,8 @@
                             <form th:action="@{/reports/{id}/update(id=${report.id})}" th:object="${report}" th:method="post">
                                 <div class="wizard wizard-success mb-4">
                                     <div class="mb-3">
-                                        <label for="id">ID</label>
-                                        <p class="mb-1"></p>
-                                        <input type="hidden" th:field="*{id}" th:value="*{id}" th:text="*{id}">
+                                        <label class="visually-hidden" for="id">ID</label>
+                                        <input type="hidden" th:field="*{id}" th:value="*{id}">
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label" for="reportDate">日付</label>

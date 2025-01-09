@@ -1,6 +1,7 @@
 package com.techacademy.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.techacademy.constants.ErrorKinds;
+import com.techacademy.entity.Employee;
 import com.techacademy.entity.Report;
 import com.techacademy.repository.ReportRepository;
 
@@ -87,6 +89,19 @@ public class ReportService {
         return report;
     }
 
+    // 指定された従業員の日報リストを返す
+    public List<Report> findByEmployee(Employee employee){
+        List<Report> reports = findAll();
+        List<Report> result = new ArrayList<Report>();
+
+        for(Report report : reports) {
+            if(report.getEmployee().getCode().equals(employee.getCode())) {
+                result.add(report);
+            }
+        }
+
+        return result;
+    }
 
     // 日付重複チェック
     private ErrorKinds isDateCheckError(Report report) {

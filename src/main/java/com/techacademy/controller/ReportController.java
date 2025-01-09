@@ -119,13 +119,7 @@ public class ReportController {
     @PostMapping(value = "/{id}/delete")
     public String delete(@PathVariable Integer id, Model model) {
 
-        ErrorKinds result = reportService.delete(id);
-
-//        if (ErrorMessage.contains(result)) {
-//            model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
-//            model.addAttribute("employee", reportService.findById(id));
-//            return detail(id, model);
-//        }
+        reportService.delete(id);
 
         return "redirect:/reports";
     }
