@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -39,6 +40,14 @@ public class ReportController {
         return "reports/list";
     }
 
+    // 日報詳細画面
+    @GetMapping(value = "/{id}/")
+    public String detail(@PathVariable Integer id, Model model) {
+
+        model.addAttribute("report", reportService.findById(id));
+        return "reports/detail";
+    }
+
     // 日報新規登録画面
     @GetMapping(value = "/add")
     public String create(@ModelAttribute Report report, @AuthenticationPrincipal UserDetail userDetail, Model model) {
@@ -65,6 +74,58 @@ public class ReportController {
             model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
             return create(report, userDetail, model);
         }
+
+        return "redirect:/reports";
+    }
+
+    // 日報更新画面
+    @GetMapping(value = "/{id}/update")
+    public String edit(@PathVariable("id") Integer id, Report report, Model model) {
+        if(id != null) {
+            // Modelに登録
+            model.addAttribute("report", reportService.findById(id));
+        } else {
+            model.addAttribute("report", report);
+        }
+        // 更新画面に遷移
+        return "reports/update";
+    }
+
+
+    // 日報更新処理
+    @PostMapping(value = "/{code}/update")
+    public String update(@Validated Report report, BindingResult res, Model model) {
+        // 従業員情報を日報情報に格納する
+        report.setEmployee(reportService.findById(report.getId()).getEmployee());
+
+        // 入力チェック
+        if (res.hasErrors()) {
+            return edit(null, report, model);
+        }
+
+        // 従業員情報を更新する
+        ErrorKinds result = reportService.update(report);
+
+        if (ErrorMessage.contains(result)) {
+            model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
+            return edit(null, report, model);
+        }
+
+        // 一覧画面にリダイレクト
+        return "redirect:/reports";
+    }
+
+    // 日報削除処理
+    @PostMapping(value = "/{id}/delete")
+    public String delete(@PathVariable Integer id, Model model) {
+
+        ErrorKinds result = reportService.delete(id);
+
+//        if (ErrorMessage.contains(result)) {
+//            model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
+//            model.addAttribute("employee", reportService.findById(id));
+//            return detail(id, model);
+//        }
 
         return "redirect:/reports";
     }
