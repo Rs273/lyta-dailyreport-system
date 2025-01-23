@@ -37,7 +37,7 @@
                                     </tr>
                                     <tr>
                                         <th>内容</th>
-                                        <td class="align-middle"><pre><label class="" th:text="${report.content}"></label></pre></td>
+                                        <td class="align-middle"><pre><label th:text="${report.content}"></label></pre></td>
                                     </tr>
                                     <tr>
                                         <th>登録日時</th>
@@ -48,7 +48,15 @@
                                         <td class="align-middle" th:text="${#temporals.format(report.updatedAt, 'yyyy-MM-dd hh:mm:ss')}"></td>
                                     </tr>
                                 </table>
-                                <div class="mt-5 row g-1">
+                                <div class="mt-1 row g-1">
+                                    <div class="col-auto" th:each="reaction:${reactionList}">
+                                        <form name="form" th:action="@{/reports/{id}/reaction(id=*{reaction.id})}" th:method="post">
+                                            <input type="hidden" th:field="${report.id}" th:value="${report.id}">
+                                            <input type="submit" th:value="*{reaction.emoji} + ' ' + *{reaction.count}" class="btn btn-light btn-lg">
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="mt-2 row g-1">
                                     <div class="col-auto">
                                         <a th:href="@{/reports/{id}/update(id=${report.id})}" class="btn btn-primary">更新</a>
                                     </div>

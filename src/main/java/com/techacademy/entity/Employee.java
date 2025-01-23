@@ -14,9 +14,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.transaction.Transactional;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.PreRemove;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
@@ -77,13 +75,16 @@ public class Employee {
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<Report> reportList;
 
-//    @PreRemove
-//    @Transactional
-//    private void preRemove() {
-//        if(!reportList.isEmpty()) {
-//            for(Report report : reportList) {
-//                report.setEmployee(null);
-//            }
-//        }
-//    }
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
+    private List<Giver> giverList;
+
+//  @PreRemove
+//  @Transactional
+//  private void preRemove() {
+//      if(!giverList.isEmpty()) {
+//          for(Giver giver : giverList) {
+//              giver.setReport(null);
+//          }
+//      }
+//  }
 }

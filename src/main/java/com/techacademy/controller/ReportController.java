@@ -1,5 +1,7 @@
 package com.techacademy.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,11 +14,16 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.techacademy.constants.ErrorKinds;
 import com.techacademy.constants.ErrorMessage;
 import com.techacademy.entity.Employee;
+import com.techacademy.entity.Giver;
+import com.techacademy.entity.Reaction;
 import com.techacademy.entity.Report;
+import com.techacademy.service.GiverService;
+import com.techacademy.service.ReactionService;
 import com.techacademy.service.ReportService;
 import com.techacademy.service.UserDetail;
 
@@ -25,10 +32,14 @@ import com.techacademy.service.UserDetail;
 public class ReportController {
 
     private final ReportService reportService;
+    private final ReactionService reactionService;
+    private final GiverService giverService;
 
     @Autowired
-    public ReportController(ReportService reportService) {
+    public ReportController(ReportService reportService, ReactionService reactionService, GiverService giverService) {
         this.reportService = reportService;
+        this.reactionService = reactionService;
+        this.giverService = giverService;
     }
 
     // 日報一覧画面
@@ -51,6 +62,10 @@ public class ReportController {
     public String detail(@PathVariable Integer id, Model model) {
 
         model.addAttribute("report", reportService.findById(id));
+
+        List<Reaction> reactionList = reactionService.findByReport(id);
+        model.addAttribute("reactionList", reactionList);
+
         return "reports/detail";
     }
 
@@ -80,6 +95,9 @@ public class ReportController {
             model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
             return create(report, userDetail, model);
         }
+
+        // 関連するリアクションを作成
+        reactionService.saveAll(report);
 
         return "redirect:/reports";
     }
@@ -127,6 +145,41 @@ public class ReportController {
 
         reportService.delete(id);
 
+        // 関連するリアクションを物理削除
+        reactionService.deleteAll(id);
+
         return "redirect:/reports";
+    }
+
+    // リアクション処理
+    @PostMapping(value = "/{id}/reaction")
+    public String reaction(@PathVariable("id") Integer id, @RequestParam("id") String reportId, @AuthenticationPrincipal UserDetail userDetail, Model model) {
+
+        // リアクションに対応するgiverListを取得
+        List<Giver> giverList = giverService.findByReaction(id);
+
+        // リアクション数に加算する数
+        int addition = 1;
+
+        // リアクションが0の場合
+        if(giverList.size() == 0) {
+            giverService.save(userDetail.getUsername(), id);
+        }
+
+        // リアクションが1以上の場合、
+        // すでにリアクションをつけている人とログイン中のユーザーが一致した場合、リアクションを消す(additionを-1にしてgiverを物理削除)
+        // 一致しない場合、リアクションをつける(additionを1にして、giverを保存)
+        for(Giver giver : giverList) {
+            if(giver.getEmployee().getCode().equals(userDetail.getUsername())) {
+                addition = -1;
+                giverService.delete(giver.getId());
+            }else {
+                giverService.save(userDetail.getUsername(), id);
+            }
+        }
+
+        reactionService.update(id, addition);
+
+        return "redirect:/reports/" + reportId + "/";
     }
 }
