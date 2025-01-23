@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.techacademy.entity.Giver;
 import com.techacademy.entity.Reaction;
 import com.techacademy.entity.Report;
 import com.techacademy.repository.ReactionRepository;
@@ -15,9 +16,11 @@ import com.techacademy.repository.ReactionRepository;
 public class ReactionService {
 
     private final ReactionRepository reactionRepository;
+    private final GiverService giverService;
 
-    public ReactionService(ReactionRepository reactionRepository) {
+    public ReactionService(ReactionRepository reactionRepository, GiverService giverService) {
         this.reactionRepository = reactionRepository;
+        this.giverService = giverService;
     }
 
     // リアクション保存
@@ -46,9 +49,10 @@ public class ReactionService {
         return;
     }
 
-    // リアクション数更新(仮)
+    // リアクション数更新
     @Transactional
     public void update(Integer id, int addition) {
+
         Reaction reactionInDb = findById(id);
 
         Reaction reaction = new Reaction();
@@ -67,6 +71,14 @@ public class ReactionService {
     public void delete(Integer id) {
         Reaction reaction = findById(id);
         reactionRepository.delete(reaction);
+
+        // リアクションに紐づくリアクション付与者情報を取得して削除
+        List<Giver> giverList = giverService.findByReaction(id);
+
+        for(Giver giver: giverList) {
+            giverService.delete(giver.getId());
+        }
+
         return;
     }
 

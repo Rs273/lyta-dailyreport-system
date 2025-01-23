@@ -17,9 +17,11 @@ import com.techacademy.repository.ReportRepository;
 public class ReportService {
 
     private final ReportRepository reportRepository;
+    private final ReactionService reactionService;
 
-    public ReportService(ReportRepository reportRepository) {
+    public ReportService(ReportRepository reportRepository, ReactionService reactionService) {
         this.reportRepository = reportRepository;
+        this.reactionService = reactionService;
     }
 
      // 日報保存
@@ -39,6 +41,8 @@ public class ReportService {
         report.setUpdatedAt(now);
 
         reportRepository.save(report);
+        // 関連するリアクションを作成
+        reactionService.saveAll(report);
         return ErrorKinds.SUCCESS;
     }
 
@@ -71,6 +75,9 @@ public class ReportService {
         LocalDateTime now = LocalDateTime.now();
         report.setUpdatedAt(now);
         report.setDeleteFlg(true);
+
+        // 関連するリアクションを物理削除
+        reactionService.deleteAll(id);
 
         return ErrorKinds.SUCCESS;
     }

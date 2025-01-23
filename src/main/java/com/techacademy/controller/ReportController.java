@@ -3,7 +3,6 @@ package com.techacademy.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -96,9 +95,6 @@ public class ReportController {
             return create(report, userDetail, model);
         }
 
-        // 関連するリアクションを作成
-        reactionService.saveAll(report);
-
         return "redirect:/reports";
     }
 
@@ -145,9 +141,6 @@ public class ReportController {
 
         reportService.delete(id);
 
-        // 関連するリアクションを物理削除
-        reactionService.deleteAll(id);
-
         return "redirect:/reports";
     }
 
@@ -163,7 +156,7 @@ public class ReportController {
 
         // リアクションが0の場合
         if(giverList.size() == 0) {
-            giverService.save(userDetail.getUsername(), id);
+            giverService.save(userDetail.getEmployee(), reactionService.findById(id));
         }
 
         // リアクションが1以上の場合、
@@ -174,7 +167,7 @@ public class ReportController {
                 addition = -1;
                 giverService.delete(giver.getId());
             }else {
-                giverService.save(userDetail.getUsername(), id);
+                giverService.save(userDetail.getEmployee(), reactionService.findById(id));
             }
         }
 

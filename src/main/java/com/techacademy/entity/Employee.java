@@ -78,13 +78,4 @@ public class Employee {
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<Giver> giverList;
 
-//  @PreRemove
-//  @Transactional
-//  private void preRemove() {
-//      if(!giverList.isEmpty()) {
-//          for(Giver giver : giverList) {
-//              giver.setReport(null);
-//          }
-//      }
-//  }
 }

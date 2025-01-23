@@ -16,21 +16,17 @@ import com.techacademy.repository.GiverRepository;
 public class GiverService {
 
     private final GiverRepository giverRepository;
-    private final EmployeeService employeeService;
-    private final ReactionService reactionService;
 
-    public GiverService(GiverRepository giverRepository, EmployeeService employeeService, ReactionService reactionService) {
+    public GiverService(GiverRepository giverRepository) {
         this.giverRepository = giverRepository;
-        this.employeeService = employeeService;
-        this.reactionService = reactionService;
     }
 
     @Transactional
-    public void save(String employeeCode, Integer reactionId) {
+    public void save(Employee employee, Reaction reaction) {
         Giver giver = new Giver();
 
-        giver.setEmployee(employeeService.findByCode(employeeCode));
-        giver.setReaction(reactionService.findById(reactionId));
+        giver.setEmployee(employee);
+        giver.setReaction(reaction);
 
         giverRepository.save(giver);
 
@@ -58,12 +54,27 @@ public class GiverService {
         return giver;
     }
 
+    // リアクションに紐づいているリアクション付与者を検索
     public List<Giver> findByReaction(Integer reactionId){
         List<Giver> givers = findAll();
         List<Giver> result = new ArrayList<Giver>();
 
         for(Giver giver : givers) {
             if(giver.getReaction().getId().equals(reactionId)) {
+                result.add(giver);
+            }
+        }
+
+        return result;
+    }
+
+    // 従業員に紐づいているリアクション付与者を検索
+    public List<Giver> findByEmployee(String employeeCode){
+        List<Giver> givers = findAll();
+        List<Giver> result = new ArrayList<Giver>();
+
+        for(Giver giver : givers) {
+            if(giver.getEmployee().getCode().equals(employeeCode)) {
                 result.add(giver);
             }
         }
