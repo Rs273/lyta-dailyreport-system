@@ -15,9 +15,12 @@
                 <h1 class="h3 mb-3">従業員 更新</h1>
             </div>
             <div class="col-12 col-xxl-6">
-                <p>パスワードは変更する場合のみ入力してください</p>
+
                 <div class="col-xl-12">
                     <div class="card">
+                        <div class="card-header">
+                            <lavel>パスワードは変更する場合のみ入力してください</lavel>
+                        </div>
                         <div class="card-body">
                             <form th:action="@{/employees/{code}/update(code=${employee.code})}" th:object="${employee}" th:method="post">
                                 <div class="wizard wizard-success mb-4">
