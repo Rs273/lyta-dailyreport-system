@@ -148,30 +148,7 @@ public class ReportController {
     @PostMapping(value = "/{id}/reaction")
     public String reaction(@PathVariable("id") Integer id, @RequestParam("id") String reportId, @AuthenticationPrincipal UserDetail userDetail, Model model) {
 
-        // リアクションに対応するgiverListを取得
-        List<Giver> giverList = giverService.findByReaction(id);
-
-        // リアクション数に加算する数
-        int addition = 1;
-
-        // リアクションが0の場合
-        if(giverList.size() == 0) {
-            giverService.save(userDetail.getEmployee(), reactionService.findById(id));
-        }
-
-        // リアクションが1以上の場合、
-        // すでにリアクションをつけている人とログイン中のユーザーが一致した場合、リアクションを消す(additionを-1にしてgiverを物理削除)
-        // 一致しない場合、リアクションをつける(additionを1にして、giverを保存)
-        for(Giver giver : giverList) {
-            if(giver.getEmployee().getCode().equals(userDetail.getUsername())) {
-                addition = -1;
-                giverService.delete(giver.getId());
-            }else {
-                giverService.save(userDetail.getEmployee(), reactionService.findById(id));
-            }
-        }
-
-        reactionService.update(id, addition);
+        reactionService.update(id, userDetail.getEmployee());
 
         return "redirect:/reports/" + reportId + "/";
     }

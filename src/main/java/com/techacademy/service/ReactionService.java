@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.techacademy.entity.Employee;
 import com.techacademy.entity.Giver;
 import com.techacademy.entity.Reaction;
 import com.techacademy.entity.Report;
@@ -51,7 +52,30 @@ public class ReactionService {
 
     // リアクション数更新
     @Transactional
-    public void update(Integer id, int addition) {
+    public void update(Integer id, Employee employee) {
+
+        // リアクションに対応するgiverListを取得
+        List<Giver> giverList = giverService.findByReaction(id);
+
+        // リアクション数に加算する数
+        int addition = 1;
+
+        // リアクションが0の場合
+        if(giverList.size() == 0) {
+            giverService.save(employee, findById(id));
+        }
+
+        // リアクションが1以上の場合、
+        // すでにリアクションをつけている人とログイン中のユーザーが一致した場合、リアクションを消す(additionを-1にしてgiverを物理削除)
+        // 一致しない場合、リアクションをつける(additionを1にして、giverを保存)
+        for(Giver giver : giverList) {
+            if(giver.getEmployee().getCode().equals(employee.getCode())) {
+                addition = -1;
+                giverService.delete(giver.getId());
+            }else {
+                giverService.save(employee, findById(id));
+            }
+        }
 
         Reaction reactionInDb = findById(id);
 

@@ -22,13 +22,11 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
     private final ReportService reportService;
-    private final GiverService giverService;
 
-    public EmployeeService(EmployeeRepository employeeRepository, PasswordEncoder passwordEncoder, ReportService reportService, GiverService giverService) {
+    public EmployeeService(EmployeeRepository employeeRepository, PasswordEncoder passwordEncoder, ReportService reportService) {
         this.employeeRepository = employeeRepository;
         this.passwordEncoder = passwordEncoder;
         this.reportService = reportService;
-        this.giverService = giverService;
     }
 
     // 従業員保存
@@ -102,13 +100,6 @@ public class EmployeeService {
         for(Report report: reportList) {
             // 日報(report)のIDを指定して、日報情報を削除
             reportService.delete(report.getId());
-        }
-
-        // 削除対象の従業員に紐づいているリアクション付与者のリスト(giverList)を取得
-        List<Giver> giverList = giverService.findByEmployee(employee.getCode());
-
-        for(Giver giver: giverList) {
-            giverService.delete(giver.getId());
         }
 
         return ErrorKinds.SUCCESS;
