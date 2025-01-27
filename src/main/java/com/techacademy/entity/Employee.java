@@ -78,4 +78,7 @@ public class Employee {
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<Giver> giverList;
 
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
+    private List<Comment> CommentList;
+
 }

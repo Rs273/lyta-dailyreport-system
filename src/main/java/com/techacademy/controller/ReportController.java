@@ -17,11 +17,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.techacademy.constants.ErrorKinds;
 import com.techacademy.constants.ErrorMessage;
+import com.techacademy.entity.Comment;
 import com.techacademy.entity.Employee;
 import com.techacademy.entity.Giver;
 import com.techacademy.entity.Reaction;
 import com.techacademy.entity.Report;
-import com.techacademy.service.GiverService;
+import com.techacademy.service.CommentService;
 import com.techacademy.service.ReactionService;
 import com.techacademy.service.ReportService;
 import com.techacademy.service.UserDetail;
@@ -32,13 +33,13 @@ public class ReportController {
 
     private final ReportService reportService;
     private final ReactionService reactionService;
-    private final GiverService giverService;
+    private final CommentService commentService;
 
     @Autowired
-    public ReportController(ReportService reportService, ReactionService reactionService, GiverService giverService) {
+    public ReportController(ReportService reportService, ReactionService reactionService, CommentService commentService) {
         this.reportService = reportService;
         this.reactionService = reactionService;
-        this.giverService = giverService;
+        this.commentService = commentService;
     }
 
     // 日報一覧画面
@@ -53,17 +54,26 @@ public class ReportController {
             model.addAttribute("reportList", reportService.findByEmployee(userDetail.getEmployee()));
         }
 
+        // 全てのコメントの編集中フラグをfalseにする
+        commentService.setFalseToEditingFlg();
+
         return "reports/list";
     }
 
     // 日報詳細画面
     @GetMapping(value = "/{id}/")
-    public String detail(@PathVariable Integer id, Model model) {
+    public String detail(@PathVariable Integer id, @ModelAttribute Comment comment, @AuthenticationPrincipal UserDetail userDetail, Model model) {
 
         model.addAttribute("report", reportService.findById(id));
+        model.addAttribute("userDetailCode", userDetail.getUsername());
 
+        // 対応するリアクション一覧を取得する
         List<Reaction> reactionList = reactionService.findByReport(id);
         model.addAttribute("reactionList", reactionList);
+
+        // 対応するコメント一覧を取得する
+        List<Comment> commentList = commentService.findByReport(id);
+        model.addAttribute("commentList", commentList);
 
         return "reports/detail";
     }
@@ -149,6 +159,56 @@ public class ReportController {
     public String reaction(@PathVariable("id") Integer id, @RequestParam("id") String reportId, @AuthenticationPrincipal UserDetail userDetail, Model model) {
 
         reactionService.update(id, userDetail.getEmployee());
+
+        return "redirect:/reports/" + reportId + "/";
+    }
+
+    // コメント登録処理
+    @PostMapping(value = "/{reportId}/add_comment")
+    public String addComment(@Validated Comment comment, BindingResult res, @PathVariable("reportId") Integer reportId, @AuthenticationPrincipal UserDetail userDetail, Model model) {
+
+        // 入力チェック
+        if (res.hasErrors()) {
+            return detail(reportId, comment, userDetail, model);
+        }
+
+        // 必要な情報をcommentに格納
+        comment.setEmployee(userDetail.getEmployee());
+        comment.setReport(reportService.findById(reportId));
+
+        // コメントを保存
+        commentService.save(comment);
+
+        return "redirect:/reports/" + reportId + "/";
+    }
+
+ // コメント編集切替処理
+    @PostMapping(value = "/{reportId}/{commentId}/update_comment")
+    public String updateComment(@RequestParam("commentContent")String commentContent, @PathVariable("reportId") Integer reportId, @PathVariable("commentId") Integer commentId, Model model) {
+
+        Comment comment = new Comment();
+        comment.setId(commentId);
+        comment.setContent(commentContent);
+
+        commentService.update(comment);
+
+        return "redirect:/reports/" + reportId + "/";
+    }
+
+    // コメント編集切替処理
+    @PostMapping(value = "/{reportId}/{commentId}/edit_comment")
+    public String editComment(@PathVariable("reportId") Integer reportId, @PathVariable("commentId") Integer commentId, Model model) {
+
+        commentService.changeEditingFlg(commentId);
+
+        return "redirect:/reports/" + reportId + "/";
+    }
+
+    // コメント削除処理
+    @PostMapping(value = "/{reportId}/{commentId}/delete_comment")
+    public String deleteComment(@PathVariable("reportId") Integer reportId, @PathVariable("commentId") Integer commentId, Model model) {
+
+        commentService.delete(commentId);
 
         return "redirect:/reports/" + reportId + "/";
     }

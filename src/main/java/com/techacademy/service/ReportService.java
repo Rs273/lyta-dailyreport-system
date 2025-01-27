@@ -82,7 +82,7 @@ public class ReportService {
         return ErrorKinds.SUCCESS;
     }
 
-    // 従業員一覧表示処理
+    // 日報一覧表示処理
     public List<Report> findAll() {
         return reportRepository.findAll();
     }

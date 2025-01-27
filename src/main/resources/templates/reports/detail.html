@@ -3,7 +3,7 @@
 
 <head th:replace="common/header :: head_fragment(title=日報詳細)"></head>
 
-<body class="h-100 overflow-hidden">
+<body class="h-100">
     <div class="row h-100">
         <div class="h-100 p-3 mb-2 bg-dark text-white col-sm-2">
             <nav th:replace="common/side :: copy"></nav>
@@ -72,6 +72,65 @@
                                 <span th:if="${deleteError} neq null" th:text="${deleteError}" class="text-danger"></span>
                             </div>
 
+                            <div class="mb-4" th:each="item:${commentList}">
+                                <table class="table table-striped">
+                                    <tr>
+                                        <th>コメント記載者</th>
+                                        <td class="align-middle" th:text="${item.employee.name}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>コメント内容</th>
+                                        <td class="align-middle">
+                                            <div th:if="${item.editingFlg} eq false">
+                                                <pre><label th:text="${item.content}"></label></pre>
+                                            </div>
+                                            <div th:if="${item.editingFlg} eq true" class="d-flex align-items-end">
+                                                <form th:action="@{/reports/{reportId}/{commentId}/update_comment(reportId=${report.id}, commentId=${item.id})}" th:method="post">
+                                                    <textarea name="commentContent" th:text="${item.content}"></textarea>
+                                                    <input type="submit" value="更新" class="btn btn-primary">
+                                                </form>
+                                                <form th:action="@{/reports/{reportId}/{commentId}/edit_comment(reportId=${report.id}, commentId=${item.id})}" th:method="post">
+                                                    <input type="submit" value="キャンセル" class="btn btn-primary">
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>登録日時</th>
+                                        <td class="align-middle" th:text="${#temporals.format(item.createdAt, 'yyyy-MM-dd hh:mm:ss')}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>更新日時</th>
+                                        <td class="align-middle" th:text="${#temporals.format(item.updatedAt, 'yyyy-MM-dd hh:mm:ss')}"></td>
+                                    </tr>
+                                </table>
+                                <div th:if="${item.employee.code} eq ${userDetailCode}" class="mt-2 row g-1">
+                                    <div class="col-auto">
+                                        <form name="form" th:action="@{/reports/{reportId}/{commentId}/edit_comment(reportId=${report.id}, commentId=${item.id})}" th:method="post">
+                                            <input type="submit" value="編集" class="btn btn-primary">
+                                        </form>
+                                    </div>
+                                    <div class="col-auto">
+                                        <form name="form" th:action="@{/reports/{reportId}/{commentId}/delete_comment(reportId=${report.id}, commentId=${item.id})}" th:method="post">
+                                            <input type="submit" value="削除" class="btn btn-primary">
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4" sec:authorize="hasAuthority('ADMIN')">
+                                <form th:action="@{/reports/{reportId}/add_comment(reportId=${report.Id})}" th:object="${comment}" th:method="post">
+                                    <div class="mb-3 row d-flex align-items-end">
+                                        <div class="col-9">
+                                            <textarea class="form-control" th:field="*{content}" th:errorclass="err" id="content"></textarea>
+                                        </div>
+                                        <div class="col-1">
+                                            <input type="submit" value="登録" class="btn btn-primary">
+                                        </div>
+                                    </div>
+                                    <span th:errors="*{content}" class="text-danger"></span>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>

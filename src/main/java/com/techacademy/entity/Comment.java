@@ -1,14 +1,10 @@
 package com.techacademy.entity;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,40 +12,30 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "reports")
+@Table(name = "comments")
 @SQLRestriction("delete_flg = false")
-public class Report {
+public class Comment {
 
     // ID
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    // 日付
-    @NotNull
-    @Column(nullable = false)
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate reportDate;
-
-    // タイトル
-    @NotEmpty
-    @Column(length = 100, nullable = false)
-    @Length(max=100)
-    private String title;
-
     // 内容
     @NotEmpty
     @Column(columnDefinition="LONGTEXT", nullable = false)
     @Length(max=600)
     private String content;
+
+    // 編集中フラグ
+    @Column(nullable = false)
+    private boolean editingFlg;
 
     // 削除フラグ(論理削除を行うため)
     @Column(columnDefinition="TINYINT", nullable = false)
@@ -63,13 +49,13 @@ public class Report {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    // 従業員コード
     @ManyToOne
     @JoinColumn(name = "employee_code", referencedColumnName = "code", nullable = false)
     private Employee employee;
 
-    @OneToMany(mappedBy = "report", cascade = CascadeType.ALL)
-    private List<Reaction> reactionList;
-
-    @OneToMany(mappedBy = "report", cascade = CascadeType.ALL)
-    private List<Comment> commentList;
+    // 日報ID
+    @ManyToOne
+    @JoinColumn(name = "report_id", referencedColumnName = "id", nullable = false)
+    private Report report;
 }
