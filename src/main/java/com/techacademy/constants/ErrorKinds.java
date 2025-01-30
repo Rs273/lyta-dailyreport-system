@@ -18,6 +18,8 @@ public enum ErrorKinds {
     LOGINCHECK_ERROR,
     // 日付チェックエラー
     DATECHECK_ERROR,
+    // コメントチェックエラー
+    COMMENTCHEK_ERROR,
     // チェックOK
     CHECK_OK,
     // 正常終了

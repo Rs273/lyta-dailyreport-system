@@ -84,14 +84,20 @@
                                             <div th:if="${item.editingFlg} eq false">
                                                 <pre><label th:text="${item.content}"></label></pre>
                                             </div>
-                                            <div th:if="${item.editingFlg} eq true" class="d-flex align-items-end">
-                                                <form th:action="@{/reports/{reportId}/{commentId}/update_comment(reportId=${report.id}, commentId=${item.id})}" th:method="post">
-                                                    <textarea name="commentContent" th:text="${item.content}"></textarea>
-                                                    <input type="submit" value="更新" class="btn btn-primary">
-                                                </form>
-                                                <form th:action="@{/reports/{reportId}/{commentId}/edit_comment(reportId=${report.id}, commentId=${item.id})}" th:method="post">
-                                                    <input type="submit" value="キャンセル" class="btn btn-primary">
-                                                </form>
+                                            <div th:if="${item.editingFlg} eq true">
+                                                <div class="d-flex align-items-end">
+                                                    <form th:action="@{/reports/{reportId}/{commentId}/update_comment(reportId=${report.id}, commentId=${item.id})}" th:method="post">
+                                                        <textarea name="commentContent" th:text="${item.content}"></textarea>
+                                                        <input type="submit" value="更新" class="btn btn-primary">
+                                                    </form>
+                                                    <form th:action="@{/reports/{reportId}/{commentId}/edit_comment(reportId=${report.id}, commentId=${item.id})}" th:method="post">
+                                                        <input type="submit" value="キャンセル" class="btn btn-primary">
+                                                    </form>
+                                                </div>
+                                                <div>
+                                                    <span th:if="${passwordError} neq null" th:text="${passwordError}" class="text-danger"></span>
+                                                    <span th:if="${commentError} neq null" th:text="${commentError}" class="text-danger"></span>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
@@ -131,6 +137,7 @@
                                     <span th:errors="*{content}" class="text-danger"></span>
                                 </form>
                             </div>
+
                         </div>
                     </div>
                 </div>

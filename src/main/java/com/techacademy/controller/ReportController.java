@@ -19,7 +19,6 @@ import com.techacademy.constants.ErrorKinds;
 import com.techacademy.constants.ErrorMessage;
 import com.techacademy.entity.Comment;
 import com.techacademy.entity.Employee;
-import com.techacademy.entity.Giver;
 import com.techacademy.entity.Reaction;
 import com.techacademy.entity.Report;
 import com.techacademy.service.CommentService;
@@ -182,15 +181,20 @@ public class ReportController {
         return "redirect:/reports/" + reportId + "/";
     }
 
- // コメント編集切替処理
+    // コメント更新処理
     @PostMapping(value = "/{reportId}/{commentId}/update_comment")
-    public String updateComment(@RequestParam("commentContent")String commentContent, @PathVariable("reportId") Integer reportId, @PathVariable("commentId") Integer commentId, Model model) {
+    public String updateComment(@RequestParam("commentContent") String commentContent, @PathVariable("reportId") Integer reportId, @PathVariable("commentId") Integer commentId, Comment newComment, @AuthenticationPrincipal UserDetail userDetail, Model model) {
 
         Comment comment = new Comment();
         comment.setId(commentId);
         comment.setContent(commentContent);
 
-        commentService.update(comment);
+        ErrorKinds result = commentService.update(comment);
+
+        if (ErrorMessage.contains(result)) {
+            model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
+            return detail(reportId, newComment, userDetail, model);
+        }
 
         return "redirect:/reports/" + reportId + "/";
     }

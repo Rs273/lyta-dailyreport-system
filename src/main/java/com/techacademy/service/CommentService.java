@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.techacademy.constants.ErrorKinds;
 import com.techacademy.entity.Comment;
 import com.techacademy.entity.Report;
 import com.techacademy.repository.CommentRepository;
@@ -39,7 +40,14 @@ public class CommentService {
 
     // コメント内容の更新
     @Transactional
-    public void update(Comment comment) {
+    public ErrorKinds update(Comment comment) {
+
+        // コメントの長さチェック
+        ErrorKinds result = commentRangeCheck(comment);
+        if (ErrorKinds.CHECK_OK != result) {
+            return result;
+        }
+
         Comment commentInDb = findById(comment.getId());
 
         comment.setEmployee(commentInDb.getEmployee());
@@ -59,7 +67,7 @@ public class CommentService {
 
         commentRepository.save(comment);
 
-        return;
+        return ErrorKinds.SUCCESS;
     }
 
     // コメント論理削除
@@ -131,5 +139,19 @@ public class CommentService {
 
         return result;
 
+    }
+
+    // コメントの長さチェック
+    private ErrorKinds commentRangeCheck(Comment comment) {
+
+        int commentLength = comment.getContent().length();
+
+        if(commentLength == 0) {
+            return ErrorKinds.BLANK_ERROR;
+        }else if(commentLength > 600) {
+            return ErrorKinds.COMMENTCHEK_ERROR;
+        }
+
+        return ErrorKinds.CHECK_OK;
     }
 }
