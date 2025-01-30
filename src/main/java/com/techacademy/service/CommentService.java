@@ -145,10 +145,7 @@ public class CommentService {
     private ErrorKinds commentRangeCheck(Comment comment) {
 
         int commentLength = comment.getContent().length();
-
-        if(commentLength == 0) {
-            return ErrorKinds.BLANK_ERROR;
-        }else if(commentLength > 600) {
+        if(commentLength < 1 || 600 < commentLength) {
             return ErrorKinds.COMMENTCHEK_ERROR;
         }
 

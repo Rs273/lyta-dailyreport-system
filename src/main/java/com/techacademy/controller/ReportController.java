@@ -171,11 +171,11 @@ public class ReportController {
             return detail(reportId, comment, userDetail, model);
         }
 
-        // 必要な情報をcommentに格納
+        // 必要な情報をcommentに格納する
         comment.setEmployee(userDetail.getEmployee());
         comment.setReport(reportService.findById(reportId));
 
-        // コメントを保存
+        // コメントを保存する
         commentService.save(comment);
 
         return "redirect:/reports/" + reportId + "/";
@@ -183,17 +183,19 @@ public class ReportController {
 
     // コメント更新処理
     @PostMapping(value = "/{reportId}/{commentId}/update_comment")
-    public String updateComment(@RequestParam("commentContent") String commentContent, @PathVariable("reportId") Integer reportId, @PathVariable("commentId") Integer commentId, Comment newComment, @AuthenticationPrincipal UserDetail userDetail, Model model) {
+    public String updateComment(@RequestParam("commentContent") String commentContent, @PathVariable("reportId") Integer reportId, @PathVariable("commentId") Integer commentId, Comment comment, @AuthenticationPrincipal UserDetail userDetail, Model model) {
 
-        Comment comment = new Comment();
-        comment.setId(commentId);
-        comment.setContent(commentContent);
+        // 更新するコメントの内容をcommentToUpdateに格納
+        Comment commentToUpdate = new Comment();
+        commentToUpdate.setId(commentId);
+        commentToUpdate.setContent(commentContent);
 
-        ErrorKinds result = commentService.update(comment);
+        // コメント情報を更新する
+        ErrorKinds result = commentService.update(commentToUpdate);
 
         if (ErrorMessage.contains(result)) {
             model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
-            return detail(reportId, newComment, userDetail, model);
+            return detail(reportId, comment, userDetail, model);
         }
 
         return "redirect:/reports/" + reportId + "/";
@@ -203,6 +205,7 @@ public class ReportController {
     @PostMapping(value = "/{reportId}/{commentId}/edit_comment")
     public String editComment(@PathVariable("reportId") Integer reportId, @PathVariable("commentId") Integer commentId, Model model) {
 
+        // コメント情報の編集中フラグを変更する
         commentService.changeEditingFlg(commentId);
 
         return "redirect:/reports/" + reportId + "/";
@@ -212,6 +215,7 @@ public class ReportController {
     @PostMapping(value = "/{reportId}/{commentId}/delete_comment")
     public String deleteComment(@PathVariable("reportId") Integer reportId, @PathVariable("commentId") Integer commentId, Model model) {
 
+        // コメント情報を削除する
         commentService.delete(commentId);
 
         return "redirect:/reports/" + reportId + "/";
