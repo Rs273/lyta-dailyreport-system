@@ -16,7 +16,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "reaction")
+@Table(name = "reactions")
 public class Reaction {
 
     // ID
