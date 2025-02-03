@@ -60,21 +60,18 @@ public class ReactionService {
         // リアクション数に加算する数
         int addition = 1;
 
-        // リアクションが0の場合
-        if(giverList.size() == 0) {
-            giverService.save(employee, findById(id));
-        }
-
         // リアクションが1以上の場合、
         // すでにリアクションをつけている人とログイン中のユーザーが一致した場合、リアクションを消す(additionを-1にしてgiverを物理削除)
-        // 一致しない場合、リアクションをつける(additionを1にして、giverを保存)
         for(Giver giver : giverList) {
             if(giver.getEmployee().getCode().equals(employee.getCode())) {
                 addition = -1;
                 giverService.delete(giver.getId());
-            }else {
-                giverService.save(employee, findById(id));
             }
+        }
+
+        // 一致しない場合(additionが1のままの場合)、リアクションをつける(giverを保存)
+        if(addition == 1) {
+            giverService.save(employee, findById(id));
         }
 
         Reaction reactionInDb = findById(id);
