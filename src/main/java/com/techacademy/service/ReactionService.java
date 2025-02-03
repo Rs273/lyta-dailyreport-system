@@ -91,14 +91,15 @@ public class ReactionService {
     @Transactional
     public void delete(Integer id) {
         Reaction reaction = findById(id);
-        reactionRepository.delete(reaction);
 
         // リアクションに紐づくリアクション付与者情報を取得して削除
         List<Giver> giverList = giverService.findByReaction(id);
-
         for(Giver giver: giverList) {
             giverService.delete(giver.getId());
         }
+
+        // リアクションを消す
+        reactionRepository.delete(reaction);
 
         return;
     }
