@@ -9,13 +9,15 @@ INSERT INTO daily_report_system.reports(report_date,title,content,employee_code,
      VALUES (CURRENT_TIMESTAMP,"煌木　太郎の記載、タイトル","煌木　太郎の記載、内容",1,0,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO daily_report_system.reports(report_date,title,content,employee_code,delete_flg,created_at,updated_at)
      VALUES (CURRENT_TIMESTAMP,"田中　太郎の記載、タイトル","田中　太郎の記載、内容",2,0,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO daily_report_system.reports(report_date,title,content,employee_code,delete_flg,created_at,updated_at)
+     VALUES (CURRENT_TIMESTAMP,"田中　太郎の記載、タイトル2","田中　太郎の記載、内容2",2,0,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 
 INSERT INTO daily_report_system.reactions(emoji,count,report_id)
      VALUES ("👍", 0, 1);
 INSERT INTO daily_report_system.reactions(emoji,count,report_id)
-     VALUES ("✅", 0, 1);
+     VALUES ("✅", 1, 1);
 INSERT INTO daily_report_system.reactions(emoji,count,report_id)
-     VALUES ("💪", 0, 1);
+     VALUES ("💪", 2, 1);
 INSERT INTO daily_report_system.reactions(emoji,count,report_id)
      VALUES ("👀", 0, 1);
 INSERT INTO daily_report_system.reactions(emoji,count,report_id)
@@ -30,3 +32,23 @@ INSERT INTO daily_report_system.reactions(emoji,count,report_id)
      VALUES ("👀", 0, 2);
 INSERT INTO daily_report_system.reactions(emoji,count,report_id)
      VALUES ("🙌", 0, 2);
+INSERT INTO daily_report_system.reactions(emoji,count,report_id)
+     VALUES ("✌️", 0, 3);
+
+INSERT INTO daily_report_system.givers(reaction_id,employee_code)
+     VALUES (2, "1");
+INSERT INTO daily_report_system.givers(reaction_id,employee_code)
+     VALUES (3, "1");
+INSERT INTO daily_report_system.givers(reaction_id,employee_code)
+     VALUES (3, "3");
+INSERT INTO daily_report_system.givers(reaction_id,employee_code)
+     VALUES (11, "1");
+
+INSERT INTO daily_report_system.comments(content,employee_code,report_id,editing_flg,delete_flg,created_at,updated_at)
+     VALUES ("煌木　太郎のコメント、内容。","1",1,0,0,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO daily_report_system.comments(content,employee_code,report_id,editing_flg,delete_flg,created_at,updated_at)
+     VALUES ("佐藤　太郎のコメント、内容。","3",2,0,0,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO daily_report_system.comments(content,employee_code,report_id,editing_flg,delete_flg,created_at,updated_at)
+     VALUES ("煌木　太郎の削除用コメント、内容。","1",2,0,0,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO daily_report_system.comments(content,employee_code,report_id,editing_flg,delete_flg,created_at,updated_at)
+     VALUES ("佐藤　太郎の更新用コメント、内容。","3",2,0,0,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
