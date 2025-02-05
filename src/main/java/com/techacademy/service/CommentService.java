@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.techacademy.constants.ErrorKinds;
 import com.techacademy.entity.Comment;
-import com.techacademy.entity.Report;
 import com.techacademy.repository.CommentRepository;
 
 @Service
