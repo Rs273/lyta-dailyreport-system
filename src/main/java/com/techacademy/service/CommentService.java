@@ -23,7 +23,7 @@ public class CommentService {
 
     // コメント保存
     @Transactional
-    public void save(Comment comment) {
+    public ErrorKinds save(Comment comment) {
 
         comment.setEditingFlg(false);
         comment.setDeleteFlg(false);
@@ -34,7 +34,7 @@ public class CommentService {
 
         commentRepository.save(comment);
 
-        return;
+        return ErrorKinds.SUCCESS;
     }
 
     // コメント内容の更新
@@ -71,19 +71,19 @@ public class CommentService {
 
     // コメント論理削除
     @Transactional
-    public void delete(Integer id) {
+    public ErrorKinds delete(Integer id) {
 
         Comment comment = findById(id);
         LocalDateTime now = LocalDateTime.now();
         comment.setUpdatedAt(now);
         comment.setDeleteFlg(true);
 
-        return;
+        return ErrorKinds.SUCCESS;
     }
 
     // 編集中フラグの変更
     @Transactional
-    public void changeEditingFlg(Integer id) {
+    public ErrorKinds changeEditingFlg(Integer id) {
 
         Comment comment = findById(id);
         if(comment.isEditingFlg()) {
@@ -93,12 +93,12 @@ public class CommentService {
         }
         commentRepository.save(comment);
 
-        return;
+        return ErrorKinds.SUCCESS;
     }
 
     // 全てのコメントの編集中フラグをfalseにする
     @Transactional
-    public void setFalseToEditingFlg() {
+    public ErrorKinds setFalseToEditingFlg() {
         List<Comment> comments = findAll();
 
         for(Comment comment: comments) {
@@ -108,7 +108,7 @@ public class CommentService {
             }
         }
 
-        return;
+        return ErrorKinds.SUCCESS;
     }
 
     // コメント一覧表示処理

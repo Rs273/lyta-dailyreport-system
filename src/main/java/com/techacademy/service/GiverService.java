@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.techacademy.constants.ErrorKinds;
 import com.techacademy.entity.Employee;
 import com.techacademy.entity.Giver;
 import com.techacademy.entity.Reaction;
@@ -22,7 +23,7 @@ public class GiverService {
     }
 
     @Transactional
-    public void save(Employee employee, Reaction reaction) {
+    public ErrorKinds save(Employee employee, Reaction reaction) {
         Giver giver = new Giver();
 
         giver.setEmployee(employee);
@@ -30,14 +31,14 @@ public class GiverService {
 
         giverRepository.save(giver);
 
-        return;
+        return ErrorKinds.SUCCESS;
     }
 
     @Transactional
-    public void delete(Integer id) {
+    public ErrorKinds delete(Integer id) {
         Giver giver = findById(id);
         giverRepository.delete(giver);
-        return;
+        return ErrorKinds.SUCCESS;
     }
 
     // 全件表示

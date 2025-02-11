@@ -1,56 +1,103 @@
 package com.techacademy.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.techacademy.constants.ErrorKinds;
+import com.techacademy.entity.Employee;
 import com.techacademy.entity.Giver;
+import com.techacademy.entity.Reaction;
+import com.techacademy.repository.GiverRepository;
 
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 class GiverServiceTest {
 
-    @Autowired
+    @Mock
+    private GiverRepository giverRepository;
+
+    @InjectMocks
     private GiverService giverService;
 
-    @Autowired
-    private ReactionService reactionService;
+    @BeforeEach
+    private void beforeEach() {
+        // 戻り値の作成
+        Employee employeeCode1 = new Employee();
+        employeeCode1.setCode("1");
+        Employee employeeCode3 = new Employee();
+        employeeCode3.setCode("3");
+        Reaction reactionId2 = new Reaction();
+        reactionId2.setId(2);
+        Reaction reactionId3 = new Reaction();
+        reactionId3.setId(3);
 
-    @Autowired
-    private EmployeeService employeeService;
+        Giver giverId1 = new Giver();
+        giverId1.setId(1);
+        giverId1.setEmployee(employeeCode1);
+        giverId1.setReaction(reactionId2);
+        Giver giverId2 = new Giver();
+        giverId2.setId(2);
+        giverId2.setEmployee(employeeCode1);
+        giverId2.setReaction(reactionId3);
+        Giver giverId3 = new Giver();
+        giverId3.setId(3);
+        giverId3.setEmployee(employeeCode3);
+        giverId3.setReaction(reactionId3);
 
-//    @BeforeAll
-//    static void beforeAll() {
-//        // テストデータの登録
-//        reactionService.update(2, employeeService.findByCode("1"));
-//        reactionService.update(3, employeeService.findByCode("1"));
-//        reactionService.update(3, employeeService.findByCode("3"));
-//    }
+        List<Giver> giverList = new ArrayList<Giver>();
+        giverList.add(giverId1);
+        giverList.add(giverId2);
+        giverList.add(giverId3);
+
+        // スタブを設定
+        Mockito.when(giverRepository.findById(1)).thenReturn(Optional.of(giverId1));
+        Mockito.when(giverRepository.findAll()).thenReturn(giverList);
+    }
 
 
     @Test
     void testSave() {
-        giverService.save(employeeService.findByCode("3"), reactionService.findById(1));
+        // giverRepositoryのsaveメソッドが問題なく終了するようスタブを設定
+        Mockito.when(giverRepository.save(any())).thenReturn(null);
 
-        Giver giver = giverService.findById(5);
-        assertEquals(giver.getId(), 5);
-        assertEquals(giver.getEmployee().getCode(), "3");
-        assertEquals(giver.getReaction().getId(), 1);
+        Employee employeeCode3 = new Employee();
+        employeeCode3.setCode("3");
+        Reaction reactionId1 = new Reaction();
+        reactionId1.setId(1);
+        ErrorKinds result = giverService.save(employeeCode3, reactionId1);
+
+        // resultがSUCCESSであることを確認する
+        assertEquals(result, ErrorKinds.SUCCESS);
+        // giverRepositoryのsaveメソッドが1回呼ばれたことを確認する
+        Mockito.verify(giverRepository, times(1)).save(any());
     }
 
     @Test
     void testDelete() {
-        giverService.delete(3);
+        // giverRepositoryのdeleteメソッドが問題なく終了するようスタブを設定
+        Mockito.doNothing().when(giverRepository).delete(any());
 
-        Giver giverNull = giverService.findById(3);
-        assertEquals(giverNull, null);
+        ErrorKinds result = giverService.delete(1);
+
+        // resultがSUCCESSであることを確認する
+        assertEquals(result, ErrorKinds.SUCCESS);
+        // giverRepositoryのsaveメソッドが1回呼ばれたことを確認する
+        Mockito.verify(giverRepository, times(1)).delete(any());
     }
 
     @Test
@@ -66,6 +113,11 @@ class GiverServiceTest {
         assertEquals(giverId2.getId(), 2);
         assertEquals(giverId2.getEmployee().getCode(), "1");
         assertEquals(giverId2.getReaction().getId(), 3);
+
+        Giver giverId3 = givers.stream().filter(e -> e.getId().equals(3)).findFirst().get();
+        assertEquals(giverId3.getId(), 3);
+        assertEquals(giverId3.getEmployee().getCode(), "3");
+        assertEquals(giverId3.getReaction().getId(), 3);
     }
 
     @Test
@@ -84,12 +136,17 @@ class GiverServiceTest {
     @Test
     void testFindByReaction() {
         // 取得できた場合
-        List<Giver> givers = giverService.findByReaction(2);
+        List<Giver> givers = giverService.findByReaction(3);
 
-        Giver giverId1 = givers.stream().filter(e -> e.getId().equals(1)).findFirst().get();
-        assertEquals(giverId1.getId(), 1);
-        assertEquals(giverId1.getEmployee().getCode(), "1");
-        assertEquals(giverId1.getReaction().getId(), 2);
+        Giver giverId2 = givers.stream().filter(e -> e.getId().equals(2)).findFirst().get();
+        assertEquals(giverId2.getId(), 2);
+        assertEquals(giverId2.getEmployee().getCode(), "1");
+        assertEquals(giverId2.getReaction().getId(), 3);
+
+        Giver giverId3 = givers.stream().filter(e -> e.getId().equals(3)).findFirst().get();
+        assertEquals(giverId3.getId(), 3);
+        assertEquals(giverId3.getEmployee().getCode(), "3");
+        assertEquals(giverId3.getReaction().getId(), 3);
 
         // 取得できなかった場合
         List<Giver> giverEmpty = giverService.findByReaction(100);

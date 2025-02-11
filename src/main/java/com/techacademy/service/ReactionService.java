@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.techacademy.constants.ErrorKinds;
 import com.techacademy.entity.Employee;
 import com.techacademy.entity.Giver;
 import com.techacademy.entity.Reaction;
@@ -26,7 +27,7 @@ public class ReactionService {
 
     // リアクション保存
     @Transactional
-    public void save(String emoji, Report report) {
+    public ErrorKinds save(String emoji, Report report) {
         Reaction reaction = new Reaction();
 
         reaction.setCount(0);
@@ -34,12 +35,12 @@ public class ReactionService {
         reaction.setEmoji(emoji);
         reactionRepository.save(reaction);
 
-        return;
+        return ErrorKinds.SUCCESS;
     }
 
     // 日報に対応するリアクション全て保存
     @Transactional
-    public void saveAll(Report report) {
+    public ErrorKinds saveAll(Report report) {
 
         save("👍", report);
         save("✅", report);
@@ -47,12 +48,12 @@ public class ReactionService {
         save("👀", report);
         save("🙌", report);
 
-        return;
+        return ErrorKinds.SUCCESS;
     }
 
     // リアクション数更新
     @Transactional
-    public void update(Integer id, Employee employee) {
+    public ErrorKinds update(Integer id, Employee employee) {
 
         // リアクションに対応するgiverListを取得
         List<Giver> giverList = giverService.findByReaction(id);
@@ -84,12 +85,12 @@ public class ReactionService {
 
         reactionRepository.save(reaction);
 
-        return;
+        return ErrorKinds.SUCCESS;
     }
 
     // リアクション削除
     @Transactional
-    public void delete(Integer id) {
+    public ErrorKinds delete(Integer id) {
         Reaction reaction = findById(id);
 
         // リアクションに紐づくリアクション付与者情報を取得して削除
@@ -101,18 +102,18 @@ public class ReactionService {
         // リアクションを消す
         reactionRepository.delete(reaction);
 
-        return;
+        return ErrorKinds.SUCCESS;
     }
 
     // 日報に対応するリアクションを全て削除
     @Transactional
-    public void deleteAll(Integer reportId) {
+    public ErrorKinds deleteAll(Integer reportId) {
         List<Reaction> reactionList = findByReport(reportId);
 
         for(Reaction reaction : reactionList) {
             delete(reaction.getId());
         }
-        return;
+        return ErrorKinds.SUCCESS;
     }
 
     // 全件表示
