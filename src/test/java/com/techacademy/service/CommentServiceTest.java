@@ -122,7 +122,7 @@ class CommentServiceTest {
         // コメントを更新する
         ErrorKinds result2 = commentService.update(blankComment);
         // エラーが発生したかを確認する
-        assertEquals(result2, ErrorKinds.COMMENTCHEK_ERROR);
+        assertEquals(result2, ErrorKinds.COMMENTCHECK_ERROR);
 
         // コメントを1文字にして更新
         Comment comment = new Comment();
@@ -155,7 +155,7 @@ class CommentServiceTest {
         // コメントを更新する
         ErrorKinds result5 = commentService.update(longComment);
         // エラーが発生したかを確認する
-        assertEquals(result5, ErrorKinds.COMMENTCHEK_ERROR);
+        assertEquals(result5, ErrorKinds.COMMENTCHECK_ERROR);
 
     }
 
