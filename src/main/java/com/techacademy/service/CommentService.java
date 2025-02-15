@@ -145,7 +145,7 @@ public class CommentService {
 
         int commentLength = comment.getContent().length();
         if(commentLength < 1 || 600 < commentLength) {
-            return ErrorKinds.COMMENTCHEK_ERROR;
+            return ErrorKinds.COMMENTCHECK_ERROR;
         }
 
         return ErrorKinds.CHECK_OK;

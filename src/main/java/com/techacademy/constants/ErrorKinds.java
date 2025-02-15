@@ -19,7 +19,7 @@ public enum ErrorKinds {
     // 日付チェックエラー
     DATECHECK_ERROR,
     // コメントチェックエラー
-    COMMENTCHEK_ERROR,
+    COMMENTCHECK_ERROR,
     // チェックOK
     CHECK_OK,
     // 正常終了
