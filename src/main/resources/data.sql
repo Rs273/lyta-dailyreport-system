@@ -5,8 +5,8 @@ INSERT INTO daily_report_system.employees(code,name,role,password,delete_flg,cre
 INSERT INTO daily_report_system.employees(code,name,role,password,delete_flg,created_at,updated_at)
      VALUES ("3","佐藤　太郎","ADMIN","$2a$10$2TffFKZXqUbMXfDvL4biaOCq.fjZP2if3Gmx1U/tLn/p6VNtZZ3Jq",0,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 
-INSERT INTO daily_report_system.reports(report_date,title,content,employee_code,delete_flg,created_at,updated_at)
-     VALUES (CURRENT_TIMESTAMP,"煌木　太郎の記載、タイトル","煌木　太郎の記載、内容",1,0,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+INSERT INTO daily_report_system.reports(report_date,title,content,employee_code,image_file_name, image_file_path, delete_flg,created_at,updated_at)
+     VALUES (CURRENT_TIMESTAMP,"煌木　太郎の記載、タイトル","煌木　太郎の記載、内容",1,"dog.jpeg","/image/1/dog.jpeg",0,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO daily_report_system.reports(report_date,title,content,employee_code,delete_flg,created_at,updated_at)
      VALUES (CURRENT_TIMESTAMP,"田中　太郎の記載、タイトル","田中　太郎の記載、内容",2,0,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 

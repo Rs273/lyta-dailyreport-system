@@ -1,5 +1,11 @@
 package com.techacademy.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +20,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.techacademy.ImageFileOperator;
 import com.techacademy.constants.ErrorKinds;
 import com.techacademy.constants.ErrorMessage;
 import com.techacademy.entity.Comment;
@@ -25,6 +33,8 @@ import com.techacademy.service.CommentService;
 import com.techacademy.service.ReactionService;
 import com.techacademy.service.ReportService;
 import com.techacademy.service.UserDetail;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("reports")
@@ -55,6 +65,11 @@ public class ReportController {
 
         // 全てのコメントの編集中フラグをfalseにする
         commentService.setFalseToEditingFlg();
+
+        // maxOfIdが-1の時、maxOfIdを更新する
+        if(ReportService.maxOfId < 0) {
+            ReportService.maxOfId = reportService.getMaxOfId();
+        }
 
         return "reports/list";
     }
@@ -89,7 +104,7 @@ public class ReportController {
 
     // 日報新規登録処理
     @PostMapping(value = "/add")
-    public String add(@Validated Report report, BindingResult res, @AuthenticationPrincipal UserDetail userDetail, Model model) {
+    public String add(@Validated Report report, BindingResult res,@RequestParam("imageFile") MultipartFile imageFile, @AuthenticationPrincipal UserDetail userDetail, Model model) {
 
         // 入力チェック
         if (res.hasErrors()) {
@@ -98,8 +113,30 @@ public class ReportController {
 
         report.setEmployee(userDetail.getEmployee());
 
+        Integer reportId = ReportService.maxOfId + 1;
+        // ファイルが選択されている場合
+        if(!imageFile.isEmpty()) {
+            // 画像ファイルをセーブする
+            ErrorKinds result = ImageFileOperator.save(reportId, imageFile);
+            if (ErrorMessage.contains(result)) {
+                model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
+                return create(report, userDetail, model);
+            }
+
+            // 日報情報に設定する
+            report.setImageFileName(imageFile.getOriginalFilename());
+            if(imageFile.getContentType().equals("application/pdf")) {
+                String basename = imageFile.getOriginalFilename();
+                String filename = basename.substring(0,basename.lastIndexOf('.'));
+                report.setImageFilePath(ImageFileOperator.CONVERT_DIR_HTML + File.separator + reportId.toString() + File.separator + filename + ".jpg");
+            } else {
+                report.setImageFilePath(ImageFileOperator.DIR_HTML + File.separator + reportId.toString() + File.separator + imageFile.getOriginalFilename());
+            }
+        }
+
         ErrorKinds result = reportService.save(report);
         if (ErrorMessage.contains(result)) {
+            ImageFileOperator.deleteWithCovertedFile(reportId, imageFile.getOriginalFilename());
             model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
             return create(report, userDetail, model);
         }
@@ -123,7 +160,7 @@ public class ReportController {
 
     // 日報更新処理
     @PostMapping(value = "/{code}/update")
-    public String update(@Validated Report report, BindingResult res, Model model) {
+    public String update(@Validated Report report, BindingResult res,@RequestParam("imageFile") MultipartFile imageFile, Model model) {
         // 従業員情報を日報情報に格納する
         report.setEmployee(reportService.findById(report.getId()).getEmployee());
 
@@ -132,10 +169,31 @@ public class ReportController {
             return edit(null, report, model);
         }
 
+        // ファイルが選択されている場合
+        if(!imageFile.isEmpty()) {
+            // 画像ファイルをセーブする
+            ErrorKinds result = ImageFileOperator.save(report.getId(), imageFile);
+            if (ErrorMessage.contains(result)) {
+                model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
+                return edit(null, report, model);
+            }
+
+            // 日報情報に設定する
+            report.setImageFileName(imageFile.getOriginalFilename());
+            if(imageFile.getContentType().equals("application/pdf")) {
+                String basename = imageFile.getOriginalFilename();
+                String filename = basename.substring(0,basename.lastIndexOf('.'));
+                report.setImageFilePath(ImageFileOperator.CONVERT_DIR_HTML + File.separator + report.getId().toString() + File.separator + filename + ".jpg");
+            } else {
+                report.setImageFilePath(ImageFileOperator.DIR_HTML + File.separator + report.getId().toString() + File.separator + imageFile.getOriginalFilename());
+            }
+        }
+
         // 従業員情報を更新する
         ErrorKinds result = reportService.update(report);
 
         if (ErrorMessage.contains(result)) {
+            ImageFileOperator.deleteWithCovertedFile(report.getId(), imageFile.getOriginalFilename());
             model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
             return edit(null, report, model);
         }
@@ -220,4 +278,27 @@ public class ReportController {
 
         return "redirect:/reports/" + reportId + "/";
     }
+
+    // 画像ファイル削除処理
+    @PostMapping(value = "/{reportId}/delete_image")
+    public String deleteImage(@PathVariable("reportId") Integer reportId, @RequestParam("imageFileName") String imageFileName) {
+
+        // ファイルを削除
+        ErrorKinds result = ImageFileOperator.deleteWithCovertedFile(reportId, imageFileName);
+
+        // DBの内容を更新する
+        Report report = reportService.findById(reportId);
+        report.setImageFileName(null);
+        report.setImageFilePath(null);
+        reportService.update(report);
+
+        return "redirect:/reports/" + reportId + "/update";
+    }
+
+    // csvファイルダウンロード処理
+    @PostMapping(value = "/{reportId}/download")
+    public String download(@PathVariable("reportId") Integer reportId, HttpServletResponse response){
+        return "redirect:/reports/" + reportId + "/";
+    }
+
 }

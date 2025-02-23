@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.techacademy.ImageFileOperator;
 import com.techacademy.constants.ErrorKinds;
 import com.techacademy.entity.Employee;
 import com.techacademy.entity.Report;
@@ -15,6 +16,8 @@ import com.techacademy.repository.ReportRepository;
 
 @Service
 public class ReportService {
+
+    public static Integer maxOfId = -1;
 
     private final ReportRepository reportRepository;
     private final ReactionService reactionService;
@@ -43,6 +46,10 @@ public class ReportService {
         reportRepository.save(report);
         // 関連するリアクションを作成
         reactionService.saveAll(report);
+
+        // maxOfIdを更新する
+        maxOfId = report.getId();
+
         return ErrorKinds.SUCCESS;
     }
 
@@ -78,6 +85,10 @@ public class ReportService {
 
         // 関連するリアクションを物理削除
         reactionService.deleteAll(id);
+
+        if(report.getImageFileName() != null) {
+            ImageFileOperator.deleteWithCovertedFile(report.getId(), report.getImageFileName());
+        }
 
         return ErrorKinds.SUCCESS;
     }
@@ -126,5 +137,17 @@ public class ReportService {
         }
 
         return ErrorKinds.CHECK_OK;
+    }
+
+    public Integer getMaxOfId() {
+        int max = 0;
+        List<Report> reports = findAll();
+
+        for(Report report : reports) {
+            if(report.getId() > max) {
+                max = report.getId();
+            }
+        }
+        return max;
     }
 }

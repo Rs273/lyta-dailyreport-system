@@ -34,6 +34,16 @@ public class ErrorMessage {
             put(ErrorKinds.DATECHECK_ERROR, new ArrayList<String>(Arrays.asList("reportDateError", "既に登録されている日付です")));
             // コメント文字数超過チェック用エラーメッセージ
             put(ErrorKinds.COMMENTCHECK_ERROR, new ArrayList<String>(Arrays.asList("commentError", "1文字以上600文字以下で入力してください")));
+            // ファイル名文字数チェック用エラーメッセージ
+            put(ErrorKinds.FILENAME_RANGECHECK_ERROR, new ArrayList<String>(Arrays.asList("imageFileError", "ファイル名は100文字以下にしてください")));
+            // ファイル名文字数チェック用エラーメッセージ
+            put(ErrorKinds.FILESIZECHECK_ERROR, new ArrayList<String>(Arrays.asList("imageFileError", "ファイルサイズは5MB以下にしてください")));
+            // 画像ファイルチェック用エラーメッセージ
+            put(ErrorKinds.IMAGEFILECHECK_ERROR, new ArrayList<String>(Arrays.asList("imageFileError", "画像ファイルを選択してください")));
+            // ファイル名重複チェック用エラーメッセージ
+            put(ErrorKinds.FILENAME_DUPLICATE_ERROR, new ArrayList<String>(Arrays.asList("imageFileError", "既に登録されているファイル名です")));
+            // ファイル名重複チェック用エラーメッセージ
+            put(ErrorKinds.PDFPAGECHECK_ERROR, new ArrayList<String>(Arrays.asList("imageFileError", "pdfは1ページにしてください")));
         }
     };
 

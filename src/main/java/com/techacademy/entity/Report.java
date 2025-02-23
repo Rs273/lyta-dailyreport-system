@@ -50,6 +50,14 @@ public class Report {
     @Column(columnDefinition="LONGTEXT", nullable = false)
     @Length(max=600)
     private String content;
+    
+    // 画像ファイル名
+    @Column(length = 100, nullable = true)
+    private String imageFileName;
+
+    // 画像ファイルパス
+    @Column(length = 260, nullable = true)
+    private String imageFilePath;
 
     // 削除フラグ(論理削除を行うため)
     @Column(columnDefinition="TINYINT", nullable = false)

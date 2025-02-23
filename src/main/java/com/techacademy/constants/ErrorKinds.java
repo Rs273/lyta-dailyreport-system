@@ -20,6 +20,16 @@ public enum ErrorKinds {
     DATECHECK_ERROR,
     // コメントチェックエラー
     COMMENTCHECK_ERROR,
+    // ファイル名文字数(100文字以下)チェックエラー
+    FILENAME_RANGECHECK_ERROR,
+    // ファイルサイズチェックエラー
+    FILESIZECHECK_ERROR,
+    // ファイル名重複チェックエラー
+    FILENAME_DUPLICATE_ERROR,
+    // 画像ファイルチェックエラー
+    IMAGEFILECHECK_ERROR,
+    // PDFのページ数チェックエラー
+    PDFPAGECHECK_ERROR,
     // チェックOK
     CHECK_OK,
     // 正常終了
