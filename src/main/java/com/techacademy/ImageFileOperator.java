@@ -89,7 +89,7 @@ public class ImageFileOperator {
             try {
                 ImageIO.write(newImg, "JPEG", covertFile);
             } catch (IOException e) {
-                throw new RuntimeException("Error write file.", e);
+                throw new RuntimeException("Error covert to jpg file.", e);
             }
             pdf.close();
         }

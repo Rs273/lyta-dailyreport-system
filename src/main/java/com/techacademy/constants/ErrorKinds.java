@@ -24,8 +24,6 @@ public enum ErrorKinds {
     FILENAME_RANGECHECK_ERROR,
     // ファイルサイズチェックエラー
     FILESIZECHECK_ERROR,
-    // ファイル名重複チェックエラー
-    FILENAME_DUPLICATE_ERROR,
     // 画像ファイルチェックエラー
     IMAGEFILECHECK_ERROR,
     // PDFのページ数チェックエラー

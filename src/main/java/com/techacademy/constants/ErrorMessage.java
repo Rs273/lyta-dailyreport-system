@@ -41,8 +41,6 @@ public class ErrorMessage {
             // 画像ファイルチェック用エラーメッセージ
             put(ErrorKinds.IMAGEFILECHECK_ERROR, new ArrayList<String>(Arrays.asList("imageFileError", "画像ファイルを選択してください")));
             // ファイル名重複チェック用エラーメッセージ
-            put(ErrorKinds.FILENAME_DUPLICATE_ERROR, new ArrayList<String>(Arrays.asList("imageFileError", "既に登録されているファイル名です")));
-            // ファイル名重複チェック用エラーメッセージ
             put(ErrorKinds.PDFPAGECHECK_ERROR, new ArrayList<String>(Arrays.asList("imageFileError", "pdfは1ページにしてください")));
         }
     };
