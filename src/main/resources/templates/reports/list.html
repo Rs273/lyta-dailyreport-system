@@ -23,6 +23,7 @@
                                             <th>氏名</th>
                                             <th>日付</th>
                                             <th>タイトル</th>
+                                            <th>添付ファイル</th>
                                             <th></th>
                                         </tr>
                                     </thead>
@@ -31,6 +32,8 @@
                                             <td class="align-middle" th:text="${report.employee.name}"></td>
                                             <td class="align-middle" th:text="${report.reportDate}"></td>
                                             <td class="align-middle" th:text="${report.title}"></td>
+                                            <td class="align-middle" th:if="${report.imageFileName} neq null" th:text="${report.imageFileName}"></td>
+                                            <td class="align-middle" th:if="${report.imageFileName} eq null">登録なし</td>
                                             <td class="align-middle"><a th:href="@{/reports/{id}/(id=${report.id})}" class="btn btn-primary">詳細</a></td>
                                         </tr>
                                     </tbody>
