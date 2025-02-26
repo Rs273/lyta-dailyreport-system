@@ -44,13 +44,15 @@ public class ReportController {
     private final ReportService reportService;
     private final ReactionService reactionService;
     private final CommentService commentService;
+    private final ImageFileOperator imageFileOperator;
     private final FileDownloader fileDownloader;
 
     @Autowired
-    public ReportController(ReportService reportService, ReactionService reactionService, CommentService commentService, FileDownloader fileDownloader) {
+    public ReportController(ReportService reportService, ReactionService reactionService, CommentService commentService, ImageFileOperator imageFileOperator, FileDownloader fileDownloader) {
         this.reportService = reportService;
         this.reactionService = reactionService;
         this.commentService = commentService;
+        this.imageFileOperator = imageFileOperator;
         this.fileDownloader = fileDownloader;
     }
 
@@ -120,7 +122,7 @@ public class ReportController {
         // ファイルが選択されている場合
         if(!imageFile.isEmpty()) {
             // 画像ファイルをセーブする
-            ErrorKinds result = ImageFileOperator.save(reportId, imageFile);
+            ErrorKinds result = imageFileOperator.save(reportId, imageFile);
             if (ErrorMessage.contains(result)) {
                 model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
                 return create(report, userDetail, model);
@@ -139,7 +141,7 @@ public class ReportController {
 
         ErrorKinds result = reportService.save(report);
         if (ErrorMessage.contains(result)) {
-            ImageFileOperator.deleteWithCovertedFile(reportId, imageFile.getOriginalFilename());
+            imageFileOperator.deleteWithCovertedFile(reportId, imageFile.getOriginalFilename());
             model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
             return create(report, userDetail, model);
         }
@@ -175,7 +177,7 @@ public class ReportController {
         // ファイルが選択されている場合
         if(!imageFile.isEmpty()) {
             // 画像ファイルをセーブする
-            ErrorKinds result = ImageFileOperator.save(report.getId(), imageFile);
+            ErrorKinds result = imageFileOperator.save(report.getId(), imageFile);
             if (ErrorMessage.contains(result)) {
                 model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
                 return edit(null, report, model);
@@ -196,7 +198,7 @@ public class ReportController {
         ErrorKinds result = reportService.update(report);
 
         if (ErrorMessage.contains(result)) {
-            ImageFileOperator.deleteWithCovertedFile(report.getId(), imageFile.getOriginalFilename());
+            imageFileOperator.deleteWithCovertedFile(report.getId(), imageFile.getOriginalFilename());
             model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
             return edit(null, report, model);
         }
@@ -287,7 +289,7 @@ public class ReportController {
     public String deleteImage(@PathVariable("reportId") Integer reportId, @RequestParam("imageFileName") String imageFileName) {
 
         // ファイルを削除
-        ErrorKinds result = ImageFileOperator.deleteWithCovertedFile(reportId, imageFileName);
+        ErrorKinds result = imageFileOperator.deleteWithCovertedFile(reportId, imageFileName);
 
         // DBの内容を更新する
         Report report = reportService.findById(reportId);

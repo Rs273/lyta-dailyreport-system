@@ -10,6 +10,7 @@ import java.util.Date;
 
 import javax.imageio.ImageIO;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.drew.imaging.ImageMetadataReader;
@@ -20,6 +21,7 @@ import com.spire.pdf.PdfDocument;
 import com.spire.pdf.graphics.PdfImageType;
 import com.techacademy.constants.ErrorKinds;
 
+@Component
 public class ImageFileOperator {
 
     public static final String DIR = "./static/image";
@@ -29,7 +31,7 @@ public class ImageFileOperator {
     public static final String TMP_DIR = "./static/image/tmp";
 
     // 画像ファイルをセーブする
-    public static ErrorKinds save(Integer reportId, MultipartFile file) {
+    public ErrorKinds save(Integer reportId, MultipartFile file) {
 
         // 画像ファイルのチェックを行う
         ErrorKinds result = imageFileCheck(file);
@@ -98,7 +100,7 @@ public class ImageFileOperator {
     }
 
     // 画像ファイル削除（PDFの場合は変換したファイルむ含めて削除）
-    public static ErrorKinds deleteWithCovertedFile(Integer reportId, String filename) {
+    public ErrorKinds deleteWithCovertedFile(Integer reportId, String filename) {
 
         delete(DIR + File.separator + reportId.toString() + File.separator + filename);
 
@@ -110,7 +112,7 @@ public class ImageFileOperator {
         return ErrorKinds.SUCCESS;
     }
 
-    private static ErrorKinds delete(String filePath) {
+    private ErrorKinds delete(String filePath) {
         File file = new File(filePath);
 
         if(file.exists()) {
@@ -124,7 +126,7 @@ public class ImageFileOperator {
     }
 
     // Exifの撮影日時情報を返す
-    private static Date getDateFromExif(String filePath) {
+    private Date getDateFromExif(String filePath) {
         File file = new File(filePath);
         try{
             Metadata metadata = ImageMetadataReader.readMetadata(file);
@@ -140,7 +142,7 @@ public class ImageFileOperator {
     }
 
     // 画像ファイルチェック
-    private static ErrorKinds imageFileCheck(MultipartFile imageFile) {
+    private ErrorKinds imageFileCheck(MultipartFile imageFile) {
 
         // ファイル名の文字数チェック処理
         if(isOutOfRangeFileName(imageFile.getOriginalFilename())) {
@@ -161,19 +163,19 @@ public class ImageFileOperator {
     }
 
     // ファイル名の文字数チェック処理
-    private static boolean isOutOfRangeFileName(String filename) {
+    private boolean isOutOfRangeFileName(String filename) {
         int length = filename.length();
         return 100 < length;
     }
 
     // ファイルサイズの上限チェック処理
-    private static boolean isOutOfRangeFileSize(MultipartFile file) {
+    private boolean isOutOfRangeFileSize(MultipartFile file) {
         long size = file.getSize();
         return size > 5 * 1024 * 1024; // 5MB
     }
 
     // 画像ファイルチェック処理
-    private static boolean isImageFile(MultipartFile file) {
+    private boolean isImageFile(MultipartFile file) {
         String contentType = file.getContentType();
         if(contentType.startsWith("image/")) {
             return false;

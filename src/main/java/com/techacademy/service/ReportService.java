@@ -21,10 +21,12 @@ public class ReportService {
 
     private final ReportRepository reportRepository;
     private final ReactionService reactionService;
+    private final ImageFileOperator imageFileOperator;
 
-    public ReportService(ReportRepository reportRepository, ReactionService reactionService) {
+    public ReportService(ReportRepository reportRepository, ReactionService reactionService, ImageFileOperator imageFileOperator) {
         this.reportRepository = reportRepository;
         this.reactionService = reactionService;
+        this.imageFileOperator = imageFileOperator;
     }
 
      // 日報保存
@@ -87,7 +89,7 @@ public class ReportService {
         reactionService.deleteAll(id);
 
         if(report.getImageFileName() != null) {
-            ImageFileOperator.deleteWithCovertedFile(report.getId(), report.getImageFileName());
+            imageFileOperator.deleteWithCovertedFile(report.getId(), report.getImageFileName());
         }
 
         return ErrorKinds.SUCCESS;
