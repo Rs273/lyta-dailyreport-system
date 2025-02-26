@@ -78,6 +78,11 @@
                                         </form>
                                     </div>
                                     <div class="col-auto">
+                                        <form name="form" th:action="@{/reports/{id}/download(id=${report.id})}" th:method="post">
+                                            <input type="submit" value="ダウンロード" class="btn btn-primary">
+                                        </form>
+                                    </div>
+                                    <div class="col-auto">
                                         <a th:href="@{/reports}" class="btn btn-primary">戻る</a>
                                     </div>
                                 </div>
@@ -113,11 +118,11 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th>登録日時</th>
+                                        <th>コメント登録日時</th>
                                         <td class="align-middle" th:text="${#temporals.format(item.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
                                     </tr>
                                     <tr>
-                                        <th>更新日時</th>
+                                        <th>コメント更新日時</th>
                                         <td class="align-middle" th:text="${#temporals.format(item.updatedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
                                     </tr>
                                 </table>

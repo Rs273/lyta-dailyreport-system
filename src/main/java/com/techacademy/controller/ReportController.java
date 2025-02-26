@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.techacademy.FileDownloader;
 import com.techacademy.ImageFileOperator;
 import com.techacademy.constants.ErrorKinds;
 import com.techacademy.constants.ErrorMessage;
@@ -43,12 +44,14 @@ public class ReportController {
     private final ReportService reportService;
     private final ReactionService reactionService;
     private final CommentService commentService;
+    private final FileDownloader fileDownloader;
 
     @Autowired
-    public ReportController(ReportService reportService, ReactionService reactionService, CommentService commentService) {
+    public ReportController(ReportService reportService, ReactionService reactionService, CommentService commentService, FileDownloader fileDownloader) {
         this.reportService = reportService;
         this.reactionService = reactionService;
         this.commentService = commentService;
+        this.fileDownloader = fileDownloader;
     }
 
     // 日報一覧画面
@@ -298,6 +301,13 @@ public class ReportController {
     // csvファイルダウンロード処理
     @PostMapping(value = "/{reportId}/download")
     public String download(@PathVariable("reportId") Integer reportId, HttpServletResponse response){
+
+        Report report = reportService.findById(reportId);
+        List<Reaction> reactionList = reactionService.findByReport(reportId);
+        List<Comment> commentList = commentService.findByReport(reportId);
+
+        fileDownloader.download(report, reactionList, commentList, response);
+
         return "redirect:/reports/" + reportId + "/";
     }
 
