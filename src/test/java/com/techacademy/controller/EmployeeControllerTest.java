@@ -67,7 +67,7 @@ class EmployeeControllerTest {
         @SuppressWarnings("unchecked")
         List<Employee> employeeList = (List<Employee>) result.getModelAndView().getModel().get("employeeList");
 
-        // employeeListをstreamへ変換した上で、streamのfilterメソッドでCodeが2の受講生のオブジェクトのみ取得する
+        // employeeListをstreamへ変換した上で、streamのfilterメソッドでCodeが1の受講生のオブジェクトのみ取得する
         Employee employeeCode1 = employeeList.stream().filter(e -> "1".equals(e.getCode())).findFirst().get();
         assertEquals(employeeCode1.getCode(), "1");
         assertEquals(employeeCode1.getName(), "煌木　太郎");
@@ -122,7 +122,7 @@ class EmployeeControllerTest {
     void testAddSuccess() throws Exception {
 
         Employee employee = new Employee();
-        employee.setCode("3");
+        employee.setCode("4");
         employee.setName("テスト太郎");
         LocalDateTime now = LocalDateTime.now();
         employee.setCreatedAt(now);

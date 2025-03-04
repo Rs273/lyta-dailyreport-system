@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.PathResource;
@@ -36,7 +37,15 @@ import jakarta.servlet.http.HttpServletResponse;
 @PropertySource("classpath:csv.properties")
 public class FileDownloader {
 
-    private static final String TMP_DIR = "./static/tmp";
+    private final ImageFileOperator imageFileOperator;
+
+    @Autowired
+    public FileDownloader(ImageFileOperator imageFileOperator) {
+        this.imageFileOperator = imageFileOperator;
+    }
+
+    @Value("${dir.tmp}")
+    private String tmpDir;
 
     @Value("${header.flg}")
     private boolean headerFlg;
@@ -63,7 +72,7 @@ public class FileDownloader {
 
         // csvファイルのパスを決定
         String fileName = report.getReportDate().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "_" + report.getEmployee().getName() + ".csv";
-        String filePath = TMP_DIR + File.separator + fileName;
+        String filePath = tmpDir + File.separator + fileName;
 
         // csvファイルの内容を追記
         StringBuilder headers = new StringBuilder("");
@@ -104,12 +113,12 @@ public class FileDownloader {
 
             // zipファイルのファイル名とパス名を設定
             String zipFileName = report.getReportDate().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "_" + report.getEmployee().getName() + ".zip";
-            String zipFilePath = TMP_DIR + File.separator + zipFileName;
+            String zipFilePath = tmpDir + File.separator + zipFileName;
 
             // zipファイルを作成する
             List<String> contentPaths = new ArrayList();
             contentPaths.add(filePath); // csvファイル
-            contentPaths.add(ImageFileOperator.DIR + File.separator + report.getId().toString() + File.separator + report.getImageFileName());
+            contentPaths.add(imageFileOperator.dir + File.separator + report.getId().toString() + File.separator + report.getImageFileName());
             createZipFile(Path.of(zipFilePath), contentPaths);
 
             // zipファイルをダウンロードさせる

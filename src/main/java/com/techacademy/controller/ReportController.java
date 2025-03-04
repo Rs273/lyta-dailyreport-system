@@ -133,15 +133,17 @@ public class ReportController {
             if(imageFile.getContentType().equals("application/pdf")) {
                 String basename = imageFile.getOriginalFilename();
                 String filename = basename.substring(0,basename.lastIndexOf('.'));
-                report.setImageFilePath(ImageFileOperator.CONVERT_DIR_HTML + File.separator + reportId.toString() + File.separator + filename + ".jpg");
+                report.setImageFilePath(imageFileOperator.convertDirHtml + File.separator + reportId.toString() + File.separator + filename + ".jpg");
             } else {
-                report.setImageFilePath(ImageFileOperator.DIR_HTML + File.separator + reportId.toString() + File.separator + imageFile.getOriginalFilename());
+                report.setImageFilePath(imageFileOperator.dirHtml + File.separator + reportId.toString() + File.separator + imageFile.getOriginalFilename());
             }
         }
 
         ErrorKinds result = reportService.save(report);
         if (ErrorMessage.contains(result)) {
-            imageFileOperator.deleteWithCovertedFile(reportId, imageFile.getOriginalFilename());
+            if(!imageFile.isEmpty()) {
+                imageFileOperator.deleteWithCovertedFile(reportId, imageFile.getOriginalFilename());
+            }
             model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
             return create(report, userDetail, model);
         }
@@ -164,7 +166,7 @@ public class ReportController {
 
 
     // 日報更新処理
-    @PostMapping(value = "/{code}/update")
+    @PostMapping(value = "/{id}/update")
     public String update(@Validated Report report, BindingResult res,@RequestParam("imageFile") MultipartFile imageFile, Model model) {
         // 従業員情報を日報情報に格納する
         report.setEmployee(reportService.findById(report.getId()).getEmployee());
@@ -188,9 +190,9 @@ public class ReportController {
             if(imageFile.getContentType().equals("application/pdf")) {
                 String basename = imageFile.getOriginalFilename();
                 String filename = basename.substring(0,basename.lastIndexOf('.'));
-                report.setImageFilePath(ImageFileOperator.CONVERT_DIR_HTML + File.separator + report.getId().toString() + File.separator + filename + ".jpg");
+                report.setImageFilePath(imageFileOperator.convertDirHtml + File.separator + report.getId().toString() + File.separator + filename + ".jpg");
             } else {
-                report.setImageFilePath(ImageFileOperator.DIR_HTML + File.separator + report.getId().toString() + File.separator + imageFile.getOriginalFilename());
+                report.setImageFilePath(imageFileOperator.dirHtml + File.separator + report.getId().toString() + File.separator + imageFile.getOriginalFilename());
             }
         }
 
@@ -198,7 +200,9 @@ public class ReportController {
         ErrorKinds result = reportService.update(report);
 
         if (ErrorMessage.contains(result)) {
-            imageFileOperator.deleteWithCovertedFile(report.getId(), imageFile.getOriginalFilename());
+            if(!imageFile.isEmpty()) {
+                imageFileOperator.deleteWithCovertedFile(report.getId(), imageFile.getOriginalFilename());
+            }
             model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
             return edit(null, report, model);
         }
@@ -289,7 +293,7 @@ public class ReportController {
     public String deleteImage(@PathVariable("reportId") Integer reportId, @RequestParam("imageFileName") String imageFileName) {
 
         // ファイルを削除
-        ErrorKinds result = imageFileOperator.deleteWithCovertedFile(reportId, imageFileName);
+        imageFileOperator.deleteWithCovertedFile(reportId, imageFileName);
 
         // DBの内容を更新する
         Report report = reportService.findById(reportId);
@@ -310,7 +314,8 @@ public class ReportController {
 
         fileDownloader.download(report, reactionList, commentList, response);
 
-        return "redirect:/reports/" + reportId + "/";
+        return null;
+//        return "redirect:/reports/" + reportId + "/";
     }
 
 }

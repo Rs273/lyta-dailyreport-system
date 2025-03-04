@@ -5,11 +5,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Date;
 
 import javax.imageio.ImageIO;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,13 +25,23 @@ import com.spire.pdf.graphics.PdfImageType;
 import com.techacademy.constants.ErrorKinds;
 
 @Component
+@PropertySource("classpath:imageFile.properties")
 public class ImageFileOperator {
 
-    public static final String DIR = "./static/image";
-    public static final String DIR_HTML = "/image";
-    public static final String CONVERT_DIR = "./static/image/convert";
-    public static final String CONVERT_DIR_HTML = "/image/convert";
-    public static final String TMP_DIR = "./static/image/tmp";
+    @Value("${dir}")
+    public String dir;
+
+    @Value("${html.dir}")
+    public String dirHtml;
+
+    @Value("${dir.convert}")
+    public String convertDir;
+
+    @Value("${html.dir.convert}")
+    public String convertDirHtml;
+
+    @Value("${dir.tmp}")
+    public String tmpDir;
 
     // 画像ファイルをセーブする
     public ErrorKinds save(Integer reportId, MultipartFile file) {
@@ -40,7 +53,7 @@ public class ImageFileOperator {
         }
 
         // ファイルを保存するためのディレクトリを作成する
-        String dirPath = DIR + File.separator + reportId.toString();
+        String dirPath = dir + File.separator + reportId.toString();
         if(Files.notExists(new File(dirPath).toPath())){
             try {
                 Files.createDirectory(new File(dirPath).toPath());
@@ -70,7 +83,7 @@ public class ImageFileOperator {
             }
 
             // jpgファイルを保存するためのディレクトリを作成する
-            String covertDirPath = CONVERT_DIR + File.separator + reportId.toString();
+            String covertDirPath = convertDir + File.separator + reportId.toString();
             if(Files.notExists(new File(covertDirPath).toPath())){
                 try {
                     Files.createDirectory(new File(covertDirPath).toPath());
@@ -102,12 +115,13 @@ public class ImageFileOperator {
     // 画像ファイル削除（PDFの場合は変換したファイルむ含めて削除）
     public ErrorKinds deleteWithCovertedFile(Integer reportId, String filename) {
 
-        delete(DIR + File.separator + reportId.toString() + File.separator + filename);
+        delete(dir + File.separator + reportId.toString() + File.separator + filename);
 
         // pdfの場合、表示用に作成したjpgファイルも削除する
+//        String filename = Paths.get(filePath).getFileName().toString();
         String extension = filename.substring(filename.lastIndexOf('.'));
         if(extension.equals(".pdf")) {
-            delete(CONVERT_DIR + File.separator + reportId.toString() + File.separator + filename.substring(0,filename.lastIndexOf('.')) + ".jpg");
+            delete(convertDir + File.separator + reportId.toString() + File.separator + filename.substring(0,filename.lastIndexOf('.')) + ".jpg");
         }
         return ErrorKinds.SUCCESS;
     }
