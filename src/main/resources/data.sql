@@ -10,7 +10,7 @@ INSERT INTO daily_report_system.reports(report_date,title,content,employee_code,
 INSERT INTO daily_report_system.reports(report_date,title,content,employee_code,delete_flg,created_at,updated_at)
      VALUES (CURRENT_TIMESTAMP,"田中　太郎の記載、タイトル","田中　太郎の記載、内容",2,0,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 INSERT INTO daily_report_system.reports(report_date,title,content,employee_code,delete_flg,created_at,updated_at)
-     VALUES (DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY),"田中　太郎の記載、タイトル","田中　太郎の記載、内容",2,0,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
+     VALUES (DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY),"田中　太郎の記載、タイトル2","田中　太郎の記載、内容2",2,0,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 
 INSERT INTO daily_report_system.reactions(emoji,count,report_id)
      VALUES ("👍", 0, 1);
@@ -32,3 +32,13 @@ INSERT INTO daily_report_system.reactions(emoji,count,report_id)
      VALUES ("👀", 0, 2);
 INSERT INTO daily_report_system.reactions(emoji,count,report_id)
      VALUES ("🙌", 0, 2);
+INSERT INTO daily_report_system.reactions(emoji,count,report_id)
+     VALUES ("👍", 0, 3);
+INSERT INTO daily_report_system.reactions(emoji,count,report_id)
+     VALUES ("✅", 0, 3);
+INSERT INTO daily_report_system.reactions(emoji,count,report_id)
+     VALUES ("💪", 0, 3);
+INSERT INTO daily_report_system.reactions(emoji,count,report_id)
+     VALUES ("👀", 0, 3);
+INSERT INTO daily_report_system.reactions(emoji,count,report_id)
+     VALUES ("🙌", 0, 3);
