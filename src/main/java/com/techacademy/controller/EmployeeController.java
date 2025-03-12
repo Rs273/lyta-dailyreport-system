@@ -1,5 +1,8 @@
 package com.techacademy.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,6 +21,7 @@ import com.techacademy.constants.ErrorMessage;
 
 import com.techacademy.entity.Employee;
 import com.techacademy.service.EmployeeService;
+import com.techacademy.service.FollowingService;
 import com.techacademy.service.UserDetail;
 
 @Controller
@@ -25,27 +29,47 @@ import com.techacademy.service.UserDetail;
 public class EmployeeController {
 
     private final EmployeeService employeeService;
+    private final FollowingService followingService;
 
     @Autowired
-    public EmployeeController(EmployeeService employeeService) {
+    public EmployeeController(EmployeeService employeeService, FollowingService followingService) {
         this.employeeService = employeeService;
+        this.followingService = followingService;
     }
 
     // 従業員一覧画面
     @GetMapping
-    public String list(Model model) {
+    public String list(@AuthenticationPrincipal UserDetail userDetail, Model model) {
 
         model.addAttribute("listSize", employeeService.findAll().size());
         model.addAttribute("employeeList", employeeService.findAll());
+
+        Map<String, Boolean> isFollowed = new HashMap<String, Boolean>();
+        for(Employee employee: employeeService.findAll()) {
+            if(followingService.findByFollowerAndFollowing(userDetail.getUsername(), employee.getCode()) != null) {
+                isFollowed.put(employee.getCode(), true);
+            } else {
+                isFollowed.put(employee.getCode(), false);
+            }
+        }
+        model.addAttribute("isFollowed", isFollowed);
 
         return "employees/list";
     }
 
     // 従業員詳細画面
     @GetMapping(value = "/{code}/")
-    public String detail(@PathVariable String code, Model model) {
+    public String detail(@PathVariable String code, @AuthenticationPrincipal UserDetail userDetail, Model model) {
 
         model.addAttribute("employee", employeeService.findByCode(code));
+
+        // 現在フォローしているかどうかを確認
+        boolean isFollowed = false;
+        if(followingService.findByFollowerAndFollowing(userDetail.getUsername(), code) != null) {
+            isFollowed = true;
+        }
+        model.addAttribute("isFollowed", isFollowed);
+
         return "employees/detail";
     }
 
@@ -140,10 +164,31 @@ public class EmployeeController {
         if (ErrorMessage.contains(result)) {
             model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
             model.addAttribute("employee", employeeService.findByCode(code));
-            return detail(code, model);
+            return detail(code, userDetail, model);
         }
 
         return "redirect:/employees";
     }
 
+    @PostMapping(value = "/{code}/follow")
+    public String follow(@PathVariable String code, @AuthenticationPrincipal UserDetail userDetail, Model model) {
+
+        // 現在フォローしているかどうかを確認
+        boolean isFollowed = false;
+        if(followingService.findByFollowerAndFollowing(userDetail.getUsername(), code) != null) {
+            isFollowed = true;
+        }
+
+        if(isFollowed) {
+            // フォローしている場合
+            followingService.delete(userDetail.getUsername(), code);
+        } else {
+            // フォローしていない場合
+            Employee followerEmployee = employeeService.findByCode(userDetail.getUsername());
+            Employee followingEmployee = employeeService.findByCode(code);
+            followingService.save(followerEmployee, followingEmployee);
+        }
+
+        return "redirect:/employees/" + code + "/";
+    }
 }

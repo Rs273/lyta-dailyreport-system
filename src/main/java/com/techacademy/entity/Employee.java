@@ -81,4 +81,10 @@ public class Employee {
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<Comment> CommentList;
 
+    @OneToMany(mappedBy = "followerEmployee", cascade = CascadeType.ALL)
+    private List<Following> followerList;
+
+    @OneToMany(mappedBy = "followingEmployee", cascade = CascadeType.ALL)
+    private List<Following> followList;
+
 }

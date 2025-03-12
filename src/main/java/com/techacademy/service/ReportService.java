@@ -123,6 +123,21 @@ public class ReportService {
         return result;
     }
 
+    public List<Report> findByEmployeeCodeList(List<String> employeeCodeList){
+        List<Report> reports = findAll();
+        List<Report> result = new ArrayList<Report>();
+
+        for(Report report: reports) {
+            for(String code: employeeCodeList) {
+                if(report.getEmployee().getCode().equals(code)) {
+                    result.add(report);
+                }
+            }
+        }
+
+        return result;
+    }
+
     // 日付重複チェック
     private ErrorKinds isDateCheckError(Report report) {
 
